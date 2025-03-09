@@ -1,0 +1,42 @@
+# Build files
+/build/
+*.o
+*.out
+*.exe
+*.log
+
+# IDE-specific files
+.vscode/
+.idea/
+*.code-workspace
+
+# macOS system files
+.DS_Store
+
+# Python Cache
+__pycache__/
+
+# CMake Build
+CMakeFiles/
+CMakeCache.txt
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# Test Output
+/tests/output/
+
+# Configuration Files
+*.env
+config.json
+
+# Node.js (if applicable)
+node_modules/
+
+# Secrets and Credentials
+*.key
+*.pem
+
