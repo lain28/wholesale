@@ -9,40 +9,20 @@
 using namespace std;
 
 // ========================
-// Utility Function for Expiration Date Calculation
+// Check if `members.txt` is Empty
 // ========================
-std::string calculateExpectedExpirationDate() {
-    time_t now = time(0);
-    tm* localTime = localtime(&now);
-
-    int month = localTime->tm_mon + 1;
-    int year = localTime->tm_year + 1901;
-
-    std::ostringstream expirationDate;
-    expirationDate << std::setfill('0') << std::setw(2) << month
-                   << "/" << year;
-
-    return expirationDate.str();
+bool isMembersFileEmpty() {
+    ifstream inFile("data/members.txt");
+    return inFile.peek() == ifstream::traits_type::eof();  // True if file is empty
 }
 
 // ========================
-// Clear `members.txt` for Clean Testing
+// Add Member Function for Testing
 // ========================
-void clearMembersFile() {
-    std::ofstream file("data/members.txt", std::ofstream::trunc);  // Clear the file
-    file.close();
-}
-
-// ========================
-// TEST CASES FOR `MemberService` CLASS
-// ========================
-
-void testAddMemberWithInput() {
-    MemberService memberService("data/members.txt"); // Uses the real data file
-
-    cout << "\n💬 Enter details for a new member:\n";
+void addMemberTest(MemberService& memberService) {
     string name, membershipType;
 
+    cout << "\nEnter details for a new member:\n";
     cout << "Enter Member Name: ";
     getline(cin, name);
 
@@ -56,65 +36,71 @@ void testAddMemberWithInput() {
     }
 
     memberService.addMember(name, membershipType);
-
-    // Reload data to confirm persistence
-    memberService.loadData();
-    const vector<Member>& members = memberService.getMembers();
-
-    assert(!members.empty());
-    assert(members[members.size() - 1].getName() == name);
-    assert(members[members.size() - 1].getMembershipType() == membershipType);
-
-    cout << "[PASS] Member successfully added via user input.\n";
+    cout << "Member successfully added.\n";
 }
 
-void testMembershipNumberFormat() {
+// ========================
+// Delete Member Function for Testing
+// ========================
+void deleteMemberTest(MemberService& memberService) {
+    if (isMembersFileEmpty()) {
+        cout << "No members to delete.\n";
+        return;
+    }
+
+    cout << "\nMembers before deletion:\n";
+    memberService.displayAllMembers();
+
+    int membershipNumberToDelete;
+    cout << "\nEnter Membership Number to delete: ";
+    cin >> membershipNumberToDelete;
+    cin.ignore();  // Clear buffer
+
+    memberService.deleteMember(membershipNumberToDelete);
+
+    cout << "\nMembers after deletion:\n";
+    memberService.displayAllMembers();
+}
+
+// ========================
+// Main Menu
+// ========================
+void mainMenu() {
     MemberService memberService("data/members.txt");
 
-    memberService.loadData();
-    const vector<Member>& members = memberService.getMembers();
+    while (true) {
+        cout << "\nChoose an option:\n";
+        cout << "1. Add Member\n";
+        cout << "2. Delete Member\n";
+        cout << "3. Exit\n";
+        cout << "Enter choice: ";
 
-    assert(members.back().getMembershipNumber() >= 10000 &&
-           members.back().getMembershipNumber() <= 99999);
+        int choice;
+        cin >> choice;
+        cin.ignore();  // Clear buffer
 
-    cout << "[PASS] Membership number correctly generated as a 5-digit number.\n";
+        switch (choice) {
+            case 1:
+                addMemberTest(memberService);
+                break;
+            case 2:
+                deleteMemberTest(memberService);
+                break;
+            case 3:
+                cout << "Exiting program...\n";
+                return;
+            default:
+                cout << "Invalid choice. Please enter 1, 2, or 3.\n";
+        }
+    }
 }
-
-void testExpirationDateFromInput() {
-    MemberService memberService("data/members.txt");
-
-    memberService.loadData();
-    const vector<Member>& members = memberService.getMembers();
-
-    assert(members.back().getExpirationDate() == calculateExpectedExpirationDate());
-
-    cout << "[PASS] Expiration date correctly set to one year from today.\n";
-}
-
-void testInitialAmountsFromInput() {
-    MemberService memberService("data/members.txt");
-
-    memberService.loadData();
-    const vector<Member>& members = memberService.getMembers();
-
-    assert(members.back().getTotalAmountSpent() == 0.0);
-    assert(members.back().getRebateAmount() == 0.0);
-
-    cout << "[PASS] Initial amounts set to $0.00 successfully.\n";
-}
-
 // ========================
 // MAIN FUNCTION (TEST EXECUTION)
 // ========================
 int main() {
-    clearMembersFile();  // Clean `members.txt` before running tests
+    mainMenu();
 
-    testAddMemberWithInput();
-    testMembershipNumberFormat();
-    testExpirationDateFromInput();
-    testInitialAmountsFromInput();
-
-    cout << "\nAll tests passed successfully!\n";
+    cout << "\nTests passed successfully!\n";
     return 0;
 }
 

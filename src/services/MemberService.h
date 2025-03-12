@@ -27,6 +27,9 @@ public:
     // Add Member Function
     void addMember(const std::string& name, const std::string& membershipType);
 
+    // Delete Member Function
+    void deleteMember(int membershipNumber);
+
     // Display Members
     void displayAllMembers() const;
 
